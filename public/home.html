@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        .url-generate {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .url-generate h1 {
+            margin-bottom: 20px;
+        }
+        .input {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .input button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .input button:hover {
+            background-color: #0056b3;
+        }
+        .url-table {
+            margin-top: 50px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .url-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .url-table th, .url-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .url-table th {
+            background-color: #f2f2f2;
+        }
+        .url-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .url-table .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .url-table .actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #007bff;
+        }
+        .url-table .actions button:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="url-generate">
+            <h1>Create Short URL</h1>
+            <div class="input">
+                <input type="url" id="long-url" placeholder="Place Your Long URL here">
+                <input type="text" id="url-purpose" placeholder="Purpose">
+                <button id="generate-btn">Generate</button>
+            </div>
+        </div>
+        <div class="url-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Short URL</th>
+                        <th>Purpose</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="url-list">
+                    <!-- URL entries will be added here dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fetch and display existing URLs when the page loads
+            fetchUrls();
+        });
+
+        document.getElementById('generate-btn').addEventListener('click', function() {
+            const longUrl = document.getElementById('long-url').value;
+            const purpose = document.getElementById('url-purpose').value;
+
+            if (longUrl && purpose) {
+                // Simulate an API call to generate a short URL
+                const shortUrl = 'https://short.url/' + Math.random().toString(36).substring(7);
+
+                // Create a new row for the table
+                const table = document.getElementById('url-list');
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td><a href="${shortUrl}" target="_blank">${shortUrl}</a></td>
+                    <td>${purpose}</td>
+                    <td class="actions">
+                        <button onclick="copyToClipboard('${shortUrl}')">Copy</button>
+                        <button onclick="deleteRow(this)">Delete</button>
+                    </td>
+                `;
+
+                table.appendChild(row);
+
+                // Clear input fields
+                document.getElementById('long-url').value = '';
+                document.getElementById('url-purpose').value = '';
+            }
+        });
+
+        function fetchUrls() {
+            const jwtToken = localStorage.getItem('token');
+            if (!jwtToken) {
+                console.error('No JWT token found in localStorage');
+                return;
+            }
+
+            // Simulate fetching URLs from the database with the JWT token
+            const existingUrls = [
+                { shortUrl: 'https://short.url/abc123', purpose: 'Example 1' },
+                { shortUrl: 'https://short.url/def456', purpose: 'Example 2' }
+            ];
+
+            const table = document.getElementById('url-list');
+            existingUrls.forEach(url => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><a href="${url.shortUrl}" target="_blank">${url.shortUrl}</a></td>
+                    <td>${url.purpose}</td>
+                    <td class="actions">
+                        <button onclick="copyToClipboard('${url.shortUrl}')">Copy</button>
+                        <button onclick="deleteRow(this)">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('URL copied to clipboard');
+            });
+        }
+
+        function deleteRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+        }
+    </script>
+</body>
+</html>
